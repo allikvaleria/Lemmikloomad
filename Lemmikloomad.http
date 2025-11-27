@@ -1,0 +1,6 @@
+@Lemmikloomad_HostAddress = http://localhost:5084
+
+GET {{Lemmikloomad_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
