@@ -24,34 +24,33 @@ namespace Lemmikloomad.Controllers
         [HttpGet("{id}")]
         public ActionResult<Lemmikloom> GetLemmikloom(int id)
         {
-            var loom = _context.Lemmikloomad.Find(id);
-            if (loom == null)
+            var pet = _context.Lemmikloomad.Find(id);
+            if (pet == null)
                 return NotFound();
-
-            return loom;
+            return pet;
         }
 
         [HttpPost]
-        public List<Lemmikloom> PostLemmikloom([FromBody] Lemmikloom loom)
+        public List<Lemmikloom> PostLemmikloom([FromBody] Lemmikloom pet)
         {
-            _context.Lemmikloomad.Add(loom);
+            _context.Lemmikloomad.Add(pet);
             _context.SaveChanges();
             return _context.Lemmikloomad.ToList();
         }
 
         [HttpPut("{id}")]
-        public ActionResult<List<Lemmikloom>> PutLemmikloom(int id, [FromBody] Lemmikloom updated)
+        public ActionResult<List<Lemmikloom>> PutLemmikloom(int id, [FromBody] Lemmikloom updatedPet)
         {
-            var loom = _context.Lemmikloomad.Find(id);
-            if (loom == null)
+            var pet = _context.Lemmikloomad.Find(id);
+            if (pet == null)
                 return NotFound();
 
-            loom.Nimi = updated.Nimi;
-            loom.Kaal = updated.Kaal;
-            loom.OmanikId = updated.OmanikId;
-            loom.KliinikId = updated.KliinikId;
+            pet.Nimi = updatedPet.Nimi;
+            pet.Kaal = updatedPet.Kaal;
+            pet.OmanikId = updatedPet.OmanikId;
+            pet.KliinikId = updatedPet.KliinikId;
 
-            _context.Lemmikloomad.Update(loom);
+            _context.Lemmikloomad.Update(pet);
             _context.SaveChanges();
 
             return Ok(_context.Lemmikloomad.ToList());
@@ -60,14 +59,22 @@ namespace Lemmikloomad.Controllers
         [HttpDelete("{id}")]
         public List<Lemmikloom> DeleteLemmikloom(int id)
         {
-            var loom = _context.Lemmikloomad.Find(id);
-            if (loom == null)
-                return _context.Lemmikloomad.ToList();
-
-            _context.Lemmikloomad.Remove(loom);
-            _context.SaveChanges();
-
+            var pet = _context.Lemmikloomad.Find(id);
+            if (pet != null)
+            {
+                _context.Lemmikloomad.Remove(pet);
+                _context.SaveChanges();
+            }
             return _context.Lemmikloomad.ToList();
+        }
+
+        [HttpGet("weight-range")]
+        public ActionResult<List<Lemmikloom>> GetPetsByWeightRange(double min, double max)
+        {
+            var pets = _context.Lemmikloomad
+                .Where(p => p.Kaal >= min && p.Kaal <= max)
+                .ToList();
+            return Ok(pets);
         }
     }
 }

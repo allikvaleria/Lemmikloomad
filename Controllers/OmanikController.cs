@@ -27,7 +27,6 @@ namespace Lemmikloomad.Controllers
             var omanik = _context.Omanikud.Find(id);
             if (omanik == null)
                 return NotFound();
-
             return omanik;
         }
 
@@ -40,15 +39,15 @@ namespace Lemmikloomad.Controllers
         }
 
         [HttpPut("{id}")]
-        public ActionResult<List<Omanik>> PutOmanik(int id, [FromBody] Omanik updated)
+        public ActionResult<List<Omanik>> PutOmanik(int id, [FromBody] Omanik updatedOmanik)
         {
             var omanik = _context.Omanikud.Find(id);
             if (omanik == null)
                 return NotFound();
 
-            omanik.Nimi = updated.Nimi;
-            omanik.Perekonnanimi = updated.Perekonnanimi;
-            omanik.Sugu = updated.Sugu;
+            omanik.Nimi = updatedOmanik.Nimi;
+            omanik.Perekonnanimi = updatedOmanik.Perekonnanimi;
+            omanik.Sugu = updatedOmanik.Sugu;
 
             _context.Omanikud.Update(omanik);
             _context.SaveChanges();
@@ -60,13 +59,59 @@ namespace Lemmikloomad.Controllers
         public List<Omanik> DeleteOmanik(int id)
         {
             var omanik = _context.Omanikud.Find(id);
-            if (omanik == null)
-                return _context.Omanikud.ToList();
+            if (omanik != null)
+            {
+                _context.Omanikud.Remove(omanik);
+                _context.SaveChanges();
+            }
+            return _context.Omanikud.ToList();
+        }
 
-            _context.Omanikud.Remove(omanik);
+        [HttpGet("{id}/count")]
+        public ActionResult<int> GetPetsCount(int id)
+        {
+            int count = _context.Lemmikloomad.Count(p => p.OmanikId == id);
+            return Ok(count);
+        }
+
+        [HttpGet("{id}/max-weight")]
+        public ActionResult<Lemmikloom> GetHeaviestPet(int id)
+        {
+            var pet = _context.Lemmikloomad
+                .Where(p => p.OmanikId == id)
+                .OrderByDescending(p => p.Kaal)
+                .FirstOrDefault();
+
+            if (pet == null)
+                return NotFound();
+            return Ok(pet);
+        }
+
+        [HttpGet("{id}/min-weight")]
+        public ActionResult<Lemmikloom> GetLightestPet(int id)
+        {
+            var pet = _context.Lemmikloomad
+                .Where(p => p.OmanikId == id)
+                .OrderBy(p => p.Kaal)
+                .FirstOrDefault();
+
+            if (pet == null)
+                return NotFound();
+            return Ok(pet);
+        }
+
+        [HttpPost("{id}/add-pet")]
+        public ActionResult<List<Lemmikloom>> AddPetToOwner(int id, [FromBody] Lemmikloom pet)
+        {
+            var omanik = _context.Omanikud.Find(id);
+            if (omanik == null)
+                return NotFound();
+
+            pet.OmanikId = id;
+            _context.Lemmikloomad.Add(pet);
             _context.SaveChanges();
 
-            return _context.Omanikud.ToList();
+            return Ok(_context.Lemmikloomad.Where(p => p.OmanikId == id).ToList());
         }
     }
 }

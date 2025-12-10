@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Lemmikloomad.Data;
 using Lemmikloomad.Models;
 
@@ -18,17 +19,16 @@ namespace Lemmikloomad.Controllers
         [HttpGet]
         public List<Kliinik> GetKliinikud()
         {
-            return _context.Kliinikud.ToList();
+            return _context.Kliinikud.Include(k => k.Lemmikloomad).ToList();
         }
 
         [HttpGet("{id}")]
         public ActionResult<Kliinik> GetKliinik(int id)
         {
-            var kliinik = _context.Kliinikud.Find(id);
-            if (kliinik == null)
+            var clinic = _context.Kliinikud.Find(id);
+            if (clinic == null)
                 return NotFound();
-
-            return kliinik;
+            return clinic;
         }
 
         [HttpPost]
@@ -40,16 +40,16 @@ namespace Lemmikloomad.Controllers
         }
 
         [HttpPut("{id}")]
-        public ActionResult<List<Kliinik>> PutKliinik(int id, [FromBody] Kliinik updated)
+        public ActionResult<List<Kliinik>> PutKliinik(int id, [FromBody] Kliinik updatedClinic)
         {
-            var kliinik = _context.Kliinikud.Find(id);
-            if (kliinik == null)
+            var clinic = _context.Kliinikud.Find(id);
+            if (clinic == null)
                 return NotFound();
 
-            kliinik.Nimi = updated.Nimi;
-            kliinik.Address = updated.Address;
+            clinic.Nimi = updatedClinic.Nimi;
+            clinic.Address = updatedClinic.Address;
 
-            _context.Kliinikud.Update(kliinik);
+            _context.Kliinikud.Update(clinic);
             _context.SaveChanges();
 
             return Ok(_context.Kliinikud.ToList());
@@ -58,14 +58,35 @@ namespace Lemmikloomad.Controllers
         [HttpDelete("{id}")]
         public List<Kliinik> DeleteKliinik(int id)
         {
-            var kliinik = _context.Kliinikud.Find(id);
-            if (kliinik == null)
-                return _context.Kliinikud.ToList();
-
-            _context.Kliinikud.Remove(kliinik);
-            _context.SaveChanges();
-
+            var clinic = _context.Kliinikud.Find(id);
+            if (clinic != null)
+            {
+                _context.Kliinikud.Remove(clinic);
+                _context.SaveChanges();
+            }
             return _context.Kliinikud.ToList();
+        }
+
+        [HttpGet("search")]
+        public ActionResult<List<Lemmikloom>> SearchPet(string name)
+        {
+            var pets = _context.Lemmikloomad
+                .Where(p => p.Nimi.ToLower().Contains(name.ToLower()))
+                .ToList();
+            return Ok(pets);
+        }
+
+        [HttpGet("top")]
+        public ActionResult<Kliinik> GetTopClinic()
+        {
+            var clinic = _context.Kliinikud
+                .Include(k => k.Lemmikloomad)
+                .OrderByDescending(k => k.Lemmikloomad.Count)
+                .FirstOrDefault();
+
+            if (clinic == null)
+                return NotFound();
+            return Ok(clinic);
         }
     }
 }

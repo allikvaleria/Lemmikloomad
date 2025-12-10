@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lemmikloomad.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251127144847_addedOmanik")]
+    [Migration("20251210064534_addedOmanik")]
     partial class addedOmanik
     {
         /// <inheritdoc />

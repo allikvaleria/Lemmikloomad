@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lemmikloomad.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251127144816_addedKliinik")]
-    partial class addedKliinik
+    [Migration("20251210064523_addedLemmikloom")]
+    partial class addedLemmikloom
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

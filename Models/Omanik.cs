@@ -6,6 +6,7 @@
         public string Nimi { get; set; }
         public string Perekonnanimi { get; set; }
         public string Sugu { get; set; }
-        public List<Lemmikloom> Lemmikloomad { get; set; }
+        public List<Lemmikloom> Lemmikloomad { get; set; } = new List<Lemmikloom>();
+
     }
 }
