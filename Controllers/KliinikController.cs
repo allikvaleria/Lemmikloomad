@@ -25,11 +25,16 @@ namespace Lemmikloomad.Controllers
         [HttpGet("{id}")]
         public ActionResult<Kliinik> GetKliinik(int id)
         {
-            var clinic = _context.Kliinikud.Find(id);
+            var clinic = _context.Kliinikud
+                .Include(k => k.Lemmikloomad)
+                .FirstOrDefault(k => k.Id == id);
+
             if (clinic == null)
                 return NotFound();
+
             return clinic;
         }
+
 
         [HttpPost]
         public List<Kliinik> PostKliinik([FromBody] Kliinik kliinik)
@@ -42,7 +47,9 @@ namespace Lemmikloomad.Controllers
         [HttpPut("{id}")]
         public ActionResult<List<Kliinik>> PutKliinik(int id, [FromBody] Kliinik updatedClinic)
         {
-            var clinic = _context.Kliinikud.Find(id);
+            var clinic = _context.Kliinikud
+                .Include(k => k.Lemmikloomad)
+                .FirstOrDefault(k => k.Id == id);
             if (clinic == null)
                 return NotFound();
 

@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Lemmikloomad.Data;
+﻿using Lemmikloomad.Data;
 using Lemmikloomad.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Lemmikloomad.Controllers
 {
@@ -18,25 +19,40 @@ namespace Lemmikloomad.Controllers
         [HttpGet]
         public List<Lemmikloom> GetLemmikloomad()
         {
-            return _context.Lemmikloomad.ToList();
+            return _context.Lemmikloomad
+                .Include(p => p.Omanik)
+                .Include(p => p.Kliinik)
+                .ToList();
         }
+
 
         [HttpGet("{id}")]
         public ActionResult<Lemmikloom> GetLemmikloom(int id)
         {
-            var pet = _context.Lemmikloomad.Find(id);
+            var pet = _context.Lemmikloomad
+                .Include(p => p.Omanik)
+                .Include(p => p.Kliinik)
+                .FirstOrDefault(p => p.Id == id);
+
             if (pet == null)
                 return NotFound();
+
             return pet;
         }
 
+
         [HttpPost]
-        public List<Lemmikloom> PostLemmikloom([FromBody] Lemmikloom pet)
+        public ActionResult<Lemmikloom> PostLemmikloom([FromBody] Lemmikloom pet)
         {
+            if (pet == null)
+                return BadRequest("Pet data is required.");
+
             _context.Lemmikloomad.Add(pet);
             _context.SaveChanges();
-            return _context.Lemmikloomad.ToList();
+
+            return CreatedAtAction(nameof(GetLemmikloom), new { id = pet.Id }, pet);
         }
+
 
         [HttpPut("{id}")]
         public ActionResult<List<Lemmikloom>> PutLemmikloom(int id, [FromBody] Lemmikloom updatedPet)

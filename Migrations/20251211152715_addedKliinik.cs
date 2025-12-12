@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -48,7 +49,10 @@ namespace Lemmikloomad.Migrations
                     Nimi = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Kaal = table.Column<double>(type: "float", nullable: false),
                     OmanikId = table.Column<int>(type: "int", nullable: false),
-                    KliinikId = table.Column<int>(type: "int", nullable: false)
+                    KliinikId = table.Column<int>(type: "int", nullable: false),
+                    Procedure = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {

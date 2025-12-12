@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Lemmikloomad.Data;
+﻿using Lemmikloomad.Data;
 using Lemmikloomad.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Lemmikloomad.Controllers
 {
@@ -18,17 +19,25 @@ namespace Lemmikloomad.Controllers
         [HttpGet]
         public List<Omanik> GetOmanikud()
         {
-            return _context.Omanikud.ToList();
+            return _context.Omanikud
+                .Include(o => o.Lemmikloomad)
+                .ToList();
         }
+
 
         [HttpGet("{id}")]
         public ActionResult<Omanik> GetOmanik(int id)
         {
-            var omanik = _context.Omanikud.Find(id);
+            var omanik = _context.Omanikud
+                .Include(o => o.Lemmikloomad)
+                .FirstOrDefault(o => o.Id == id);
+
             if (omanik == null)
                 return NotFound();
+
             return omanik;
         }
+
 
         [HttpPost]
         public List<Omanik> PostOmanik([FromBody] Omanik omanik)
